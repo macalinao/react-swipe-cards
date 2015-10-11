@@ -2,7 +2,7 @@
   "name": "react-swipe-cards",
   "version": "1.0.0",
   "description": "Tinder-like swiping cards implemented in React.",
-  "main": "react-swipe-cards.js",
+  "main": "react-swipe-cards.jsx",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
