@@ -1,4 +1,6 @@
+import $ from 'jquery';
 import React from 'react';
+import ReactDOM from 'react-dom';
 
 export default React.createClass({
 
@@ -29,24 +31,36 @@ export const Card = React.createClass({
 
   getDefaultProps() {
     return {
-      height: '500px',
-      width: '300px',
-      infoHeight: '60px',
+      height: 500,
+      width: 300,
+      infoHeight: 60,
       index: 0
     };
   },
 
+  getInitialState() {
+    return {
+      dragging: false,
+      offset: {
+        x: 0,
+        y: 0
+      },
+      relative: null
+    }
+  },
+
   cardStyle() {
     return {
-      height: this.props.height,
-      width: this.props.width,
+      height: `${this.props.height}px`,
+      width: `${this.props.width}px`,
       borderRadius: '10px',
       border: '1px #ccc solid',
       backgroundClip: 'content-box',
       position: 'absolute',
       marginTop: `${this.props.index * 5}px`,
       backgroundColor: '#fff',
-      zIndex: 100 - this.props.index
+      zIndex: 100 - this.props.index,
+      transform: `translate(${this.state.offset.x}px, ${this.state.offset.y}px) rotate(${-(this.state.offset.x / this.props.width) * 8}deg)`
     };
   },
 
@@ -56,7 +70,7 @@ export const Card = React.createClass({
 
   cardImageStyle() {
     return {
-      height: `calc(100% - ${this.props.infoHeight})`,
+      height: `calc(100% - ${this.props.infoHeight}px)`,
       background: `url(${this.props.picture})`,
       backgroundSize: 'auto 100%',
       backgroundRepeat: 'no-repeat',
@@ -84,13 +98,62 @@ export const Card = React.createClass({
 
   cardInfoStyle() {
     return {
-      height: this.props.infoHeight,
+      height: `${this.props.infoHeight}px`,
       padding: '20px 15px'
     };
   },
 
+  // calculate relative position to the mouse and set dragging=true
+  onMouseDown: function (e) {
+    // only left mouse button
+    if (e.button !== 0) return;
+    this.setState({
+      dragging: true,
+      start: {
+        x: e.pageX,
+        y: e.pageY
+      }
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  },
+
+  onMouseUp: function (e) {
+    this.setState({
+      dragging: false,
+      offset: {
+        x: 0,
+        y: 0
+      }
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  },
+
+  onMouseMove: function (e) {
+    if (!this.state.dragging) return;
+    this.setState({
+      offset: {
+        x: e.pageX - this.state.start.x,
+        y: e.pageY - this.state.start.y
+      }
+    });
+    e.stopPropagation();
+    e.preventDefault();
+  },
+
+  componentDidUpdate: function (props, state) {
+    if (this.state.dragging && !state.dragging) {
+      document.addEventListener('mousemove', this.onMouseMove)
+      document.addEventListener('mouseup', this.onMouseUp)
+    } else if (!this.state.dragging && state.dragging) {
+      document.removeEventListener('mousemove', this.onMouseMove)
+      document.removeEventListener('mouseup', this.onMouseUp)
+    }
+  },
+
   render() {
-    return <div style={this.cardStyle()}>
+    return <div style={this.cardStyle()} onMouseDown={this.onMouseDown}>
       {this.cardImage()}
       {this.cardInfo()}
     </div>;
