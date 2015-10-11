@@ -2,22 +2,19 @@ import React from 'react';
 
 export default React.createClass({
 
-  cards() {
-    let ret = [];
-    for (let i = 0; i < 10; i++) {
-      ret.push(<Card
-        name="Test"
-        age={18}
-        friends={3}
-        moments={3}
-        picture="https://avatars3.githubusercontent.com/u/401263?v=3&s=460"
-      />);
+  getDefaultProps() {
+    return {
+      height: '500px',
+      width: '300px',
+      cards: []
     }
-    return ret;
   },
 
   renderCardStack() {
-    return this.cards();
+    let cardsToShow = this.props.cards.slice(0, 4);
+    return cardsToShow.map((card, index) => {
+      return <Card {...card} index={index} />;
+    });
   },
 
   render() {
@@ -34,7 +31,8 @@ export const Card = React.createClass({
     return {
       height: '500px',
       width: '300px',
-      infoHeight: '60px'
+      infoHeight: '60px',
+      index: 0
     };
   },
 
@@ -44,7 +42,11 @@ export const Card = React.createClass({
       width: this.props.width,
       borderRadius: '10px',
       border: '1px #ccc solid',
-      backgroundClip: 'content-box'
+      backgroundClip: 'content-box',
+      position: 'absolute',
+      marginTop: `${this.props.index * 5}px`,
+      backgroundColor: '#fff',
+      zIndex: 100 - this.props.index
     };
   },
 
@@ -55,7 +57,7 @@ export const Card = React.createClass({
   cardImageStyle() {
     return {
       height: `calc(100% - ${this.props.infoHeight})`,
-      background: `url(${this.props.picture});`,
+      background: `url(${this.props.picture})`,
       backgroundSize: 'auto 100%',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center top',
