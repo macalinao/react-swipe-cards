@@ -212,17 +212,22 @@ export const Card = React.createClass({
   },
 
   onTouchStart(e) {
+    e.preventDefault();
+    e.stopPropagation()
     e = e.touches[0];
     this.startDragging(e.pageX, e.pageY);
   },
 
   onTouchEnd(e) {
+    e.preventDefault();
+    e.stopPropagation()
     this.stopDragging();
-    e.stopPropagation();
   },
 
   onTouchMove(e) {
     if (!this.state.dragging) return;
+    e.preventDefault();
+    e.stopPropagation()
     e = e.touches[0];
     this.onDrag(e.pageX, e.pageY);
   },

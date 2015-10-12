@@ -273,17 +273,22 @@ var Card = _react2['default'].createClass({
   },
 
   onTouchStart: function onTouchStart(e) {
+    e.preventDefault();
+    e.stopPropagation();
     e = e.touches[0];
     this.startDragging(e.pageX, e.pageY);
   },
 
   onTouchEnd: function onTouchEnd(e) {
-    this.stopDragging();
+    e.preventDefault();
     e.stopPropagation();
+    this.stopDragging();
   },
 
   onTouchMove: function onTouchMove(e) {
     if (!this.state.dragging) return;
+    e.preventDefault();
+    e.stopPropagation();
     e = e.touches[0];
     this.onDrag(e.pageX, e.pageY);
   },
