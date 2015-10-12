@@ -188,14 +188,7 @@ export const Card = React.createClass({
     });
   },
 
-  stopDragging(x, y) {
-    this.setState({
-      offset: {
-        x: x - this.state.start.x,
-        y: y - this.state.start.y
-      }
-    });
-
+  stopDragging() {
     if (Math.abs(this.swipeMagnitude()) > 0.5) {
       this.props.onSwipe(this.props.index, this.swipeMagnitude() > 0);
     }
@@ -221,26 +214,22 @@ export const Card = React.createClass({
   onTouchStart(e) {
     e = e.touches[0];
     this.startDragging(e.pageX, e.pageY);
-    e.preventDefault();
   },
 
   onTouchEnd(e) {
-    e = e.touches[0];
-    this.stopDragging(e.pageX, e.pageY);
+    this.stopDragging();
     e.stopPropagation();
-    e.preventDefault();
   },
 
   onTouchMove(e) {
     if (!this.state.dragging) return;
     e = e.touches[0];
     this.onDrag(e.pageX, e.pageY);
-    e.preventDefault();
   },
 
   onMouseDown(e) {
     if (e.button !== 0) return;
-    this.startDragging(e.pageX, e.pageY);
+    this.startDragging();
     e.stopPropagation();
     e.preventDefault();
   },
