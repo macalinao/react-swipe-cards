@@ -196,7 +196,7 @@ export const Card = React.createClass({
       }
     });
 
-    if (Math.abs(this.swipeMagnitude()) > 1) {
+    if (Math.abs(this.swipeMagnitude()) > 0.5) {
       this.props.onSwipe(this.props.index, this.swipeMagnitude() > 0);
     }
 
