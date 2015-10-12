@@ -234,14 +234,14 @@ export const Card = React.createClass({
 
   onMouseDown(e) {
     if (e.button !== 0) return;
-    this.startDragging();
+    this.startDragging(e.pageX, e.pageY);
     e.stopPropagation();
     e.preventDefault();
   },
 
   onMouseUp(e) {
     if (e.button !== 0) return;
-    this.stopDragging(e.pageX, e.pageY);
+    this.stopDragging();
     e.stopPropagation();
     e.preventDefault();
   },
