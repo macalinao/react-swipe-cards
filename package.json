@@ -5,7 +5,7 @@
   "main": "dist/SwipeCards",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "babel src/ -d dist/"
+    "postinstall": "./node_modules/.bin/babel src/ -d dist/"
   },
   "author": "Ian Macalinao <me@ian.pw>",
   "license": "MIT",
