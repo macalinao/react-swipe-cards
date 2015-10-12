@@ -5,11 +5,12 @@
   "main": "dist/SwipeCards",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "sh build.sh"
+    "postinstall": "babel src/ -d dist/"
   },
   "author": "Ian Macalinao <me@ian.pw>",
   "license": "MIT",
   "dependencies": {
+    "babel": "^5.8.23",
     "react": "^0.14.0"
   }
 }
