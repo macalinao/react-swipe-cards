@@ -4,7 +4,8 @@
   "description": "Tinder-like swiping cards implemented in React.",
   "main": "dist/SwipeCards",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "sh build.sh"
   },
   "author": "Ian Macalinao <me@ian.pw>",
   "license": "MIT",
