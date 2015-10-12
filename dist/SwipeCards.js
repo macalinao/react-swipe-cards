@@ -74,7 +74,7 @@ exports['default'] = _react2['default'].createClass({
     return cardsToShow.map(function (card, index) {
       return _react2['default'].createElement(Card, _extends({
         height: _this.props.height, width: _this.props.width
-      }, card, { index: index, onSwipe: _this.onCardSwipe }));
+      }, card, { key: index, index: index, onSwipe: _this.onCardSwipe }));
     });
   },
 
@@ -133,7 +133,7 @@ var Card = _react2['default'].createClass({
   cardImageStyle: function cardImageStyle() {
     return {
       height: 'calc(100% - ' + this.props.infoHeight + 'px)',
-      background: 'url(' + this.props.picture + ')',
+      backgroundImage: 'url(' + this.props.picture + ')',
       backgroundSize: 'auto 100%',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center top',

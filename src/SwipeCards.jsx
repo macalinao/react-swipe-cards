@@ -50,7 +50,7 @@ export default React.createClass({
     return cardsToShow.map((card, index) => {
       return <Card
         height={this.props.height} width={this.props.width}
-        {...card} index={index} onSwipe={this.onCardSwipe} />;
+        {...card} key={index} index={index} onSwipe={this.onCardSwipe} />;
     });
   },
 
@@ -107,7 +107,7 @@ export const Card = React.createClass({
   cardImageStyle() {
     return {
       height: `calc(100% - ${this.props.infoHeight}px)`,
-      background: `url(${this.props.picture})`,
+      backgroundImage: `url(${this.props.picture})`,
       backgroundSize: 'auto 100%',
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center top',
