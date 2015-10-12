@@ -59,7 +59,7 @@ export const Card = React.createClass({
       marginTop: `${this.props.index * 5}px`,
       backgroundColor: '#fff',
       zIndex: 100 - this.props.index,
-      transform: `translate(${this.state.offset.x}px, ${this.state.offset.y}px) rotate(${-(this.state.offset.x / this.props.width) * 8}deg)`
+      transform: `translate(${this.state.offset.x}px, ${this.state.offset.y}px) rotate(${-(this.swipeMagnitude()) * 8}deg)`
     };
   },
 
@@ -75,7 +75,8 @@ export const Card = React.createClass({
       backgroundRepeat: 'no-repeat',
       backgroundPosition: 'center top',
       borderTopLeftRadius: '9px', // Needed for border
-      borderTopRightRadius: '9px' // Needed for border
+      borderTopRightRadius: '9px', // Needed for border
+      backgroundColor: '#ccc' // Blank background
     }
   },
 
@@ -102,22 +103,55 @@ export const Card = React.createClass({
     };
   },
 
-  // calculate relative position to the mouse and set dragging=true
-  onMouseDown: function (e) {
-    // only left mouse button
-    if (e.button !== 0) return;
-    this.setState({
-      dragging: true,
-      start: {
-        x: e.pageX,
-        y: e.pageY
-      }
-    });
-    e.stopPropagation();
-    e.preventDefault();
+  likeNope() {
+    return <div>
+      <div style={this.nopeStyle()}>Nope</div>
+      <div style={this.likeStyle()}>Like</div>
+    </div>;
   },
 
-  onMouseUp: function (e) {
+  likeNopeStyle() {
+    return {
+      marginTop: '25px',
+      position: 'absolute',
+      borderRadius: '10px',
+      textTransform: 'uppercase',
+      fontSize: '30px',
+      padding: '5px 10px',
+      fontWeight: 'bold'
+    };
+  },
+
+  likeStyle() {
+    return Object.assign(this.likeNopeStyle(), {
+      left: 0,
+      marginLeft: '20px',
+      color: '#4bcc82',
+      border: '6px solid #4bcc82',
+      opacity: this.swipeMagnitude(),
+      transform: 'rotate(-10deg)'
+    });
+  },
+
+  nopeStyle() {
+    return Object.assign(this.likeNopeStyle(), {
+      right: 0,
+      marginRight: '20px',
+      color: '#f78267',
+      border: '6px solid #f78267',
+      opacity: -this.swipeMagnitude(),
+      transform: 'rotate(20deg)'
+    });
+  },
+
+  startDragging(x, y) {
+    this.setState({
+      dragging: true,
+      start: { x, y }
+    });
+  },
+
+  stopDragging() {
     this.setState({
       dragging: false,
       offset: {
@@ -125,34 +159,77 @@ export const Card = React.createClass({
         y: 0
       }
     });
+  },
+
+  onDrag(x, y) {
+    this.setState({
+      offset: {
+        x: x - this.state.start.x,
+        y: y - this.state.start.y
+      }
+    });
+  },
+
+  onTouchStart(e) {
+    e = e.touches[0];
+    this.startDragging(e.pageX, e.pageY);
+    e.preventDefault();
+  },
+
+  onTouchEnd(e) {
+    this.stopDragging();
     e.stopPropagation();
     e.preventDefault();
   },
 
-  onMouseMove: function (e) {
+  onTouchMove(e) {
     if (!this.state.dragging) return;
-    this.setState({
-      offset: {
-        x: e.pageX - this.state.start.x,
-        y: e.pageY - this.state.start.y
-      }
-    });
+    e = e.touches[0];
+    this.onDrag(e.pageX, e.pageY);
+    e.preventDefault();
+  },
+
+  onMouseDown(e) {
+    if (e.button !== 0) return;
+    this.startDragging(e.pageX, e.pageY);
     e.stopPropagation();
     e.preventDefault();
+  },
+
+  onMouseUp(e) {
+    this.stopDragging();
+    e.stopPropagation();
+    e.preventDefault();
+  },
+
+  onMouseMove(e) {
+    if (!this.state.dragging) return;
+    this.onDrag(e.pageX, e.pageY);
+    e.stopPropagation();
+    e.preventDefault();
+  },
+
+  swipeMagnitude() {
+    return this.state.offset.x / this.props.width;
   },
 
   componentDidUpdate: function (props, state) {
     if (this.state.dragging && !state.dragging) {
-      document.addEventListener('mousemove', this.onMouseMove)
-      document.addEventListener('mouseup', this.onMouseUp)
+      document.addEventListener('touchmove', this.onTouchMove);
+      document.addEventListener('touchend', this.onTouchEnd);
+      document.addEventListener('mousemove', this.onMouseMove);
+      document.addEventListener('mouseup', this.onMouseUp);
     } else if (!this.state.dragging && state.dragging) {
-      document.removeEventListener('mousemove', this.onMouseMove)
-      document.removeEventListener('mouseup', this.onMouseUp)
+      document.removeEventListener('touchmove', this.onTouchMove);
+      document.removeEventListener('touchend', this.onTouchEnd);
+      document.removeEventListener('mousemove', this.onMouseMove);
+      document.removeEventListener('mouseup', this.onMouseUp);
     }
   },
 
   render() {
-    return <div style={this.cardStyle()} onMouseDown={this.onMouseDown}>
+    return <div style={this.cardStyle()} onMouseDown={this.onMouseDown} onTouchStart={this.onTouchStart}>
+      {this.likeNope()}
       {this.cardImage()}
       {this.cardInfo()}
     </div>;
