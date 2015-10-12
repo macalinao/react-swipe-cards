@@ -5,21 +5,58 @@ export default React.createClass({
 
   getDefaultProps() {
     return {
-      height: '500px',
-      width: '300px',
+      height: 500,
+      width: 300,
       cards: []
     }
   },
 
+  getInitialState() {
+    return {
+      cards: this.props.cards.slice()
+    };
+  },
+
+  onCardSwipe(card, like) {
+    this.state.cards.splice(card, 1);
+    this.setState({
+      cards: this.state.cards
+    });
+    console.log(`Like? ${like}`);
+  },
+
+  renderEmptyCard() {
+    return <div style={{
+      backgroundColor: '#ccc',
+      height: `${this.props.height}px`,
+      width: `${this.props.width}px`,
+      border: '2px #aaa solid',
+      borderRadius: '10px',
+      position: 'absolute',
+      zIndex: -1
+    }}>
+      <p style={{
+        textAlign: 'center',
+        width: '100%',
+        marginTop: '50%',
+        fontSize: '30px',
+        color: '#555'
+      }}>No cards left!</p>
+    </div>;
+  },
+
   renderCardStack() {
-    let cardsToShow = this.props.cards.slice(0, 4);
+    let cardsToShow = this.state.cards.slice(0, 4);
     return cardsToShow.map((card, index) => {
-      return <Card {...card} index={index} />;
+      return <Card
+        height={this.props.height} width={this.props.width}
+        {...card} index={index} onSwipe={this.onCardSwipe} />;
     });
   },
 
   render() {
     return <div style={{ fontFamily: 'Lato, sans-serif' }}>
+      {this.renderEmptyCard()}
       {this.renderCardStack()}
     </div>;
   }
@@ -151,7 +188,18 @@ export const Card = React.createClass({
     });
   },
 
-  stopDragging() {
+  stopDragging(x, y) {
+    this.setState({
+      offset: {
+        x: x - this.state.start.x,
+        y: y - this.state.start.y
+      }
+    });
+
+    if (Math.abs(this.swipeMagnitude()) > 1) {
+      this.props.onSwipe(this.props.index, this.swipeMagnitude() > 0);
+    }
+
     this.setState({
       dragging: false,
       offset: {
@@ -177,7 +225,8 @@ export const Card = React.createClass({
   },
 
   onTouchEnd(e) {
-    this.stopDragging();
+    e = e.touches[0];
+    this.stopDragging(e.pageX, e.pageY);
     e.stopPropagation();
     e.preventDefault();
   },
@@ -197,7 +246,8 @@ export const Card = React.createClass({
   },
 
   onMouseUp(e) {
-    this.stopDragging();
+    if (e.button !== 0) return;
+    this.stopDragging(e.pageX, e.pageY);
     e.stopPropagation();
     e.preventDefault();
   },
@@ -213,18 +263,30 @@ export const Card = React.createClass({
     return this.state.offset.x / this.props.width;
   },
 
-  componentDidUpdate: function (props, state) {
+  addMovementListeners() {
+    document.addEventListener('touchmove', this.onTouchMove);
+    document.addEventListener('touchend', this.onTouchEnd);
+    document.addEventListener('mousemove', this.onMouseMove);
+    document.addEventListener('mouseup', this.onMouseUp);
+  },
+
+  removeMovementListeners() {
+    document.removeEventListener('touchmove', this.onTouchMove);
+    document.removeEventListener('touchend', this.onTouchEnd);
+    document.removeEventListener('mousemove', this.onMouseMove);
+    document.removeEventListener('mouseup', this.onMouseUp);
+  },
+
+  componentDidUpdate(props, state) {
     if (this.state.dragging && !state.dragging) {
-      document.addEventListener('touchmove', this.onTouchMove);
-      document.addEventListener('touchend', this.onTouchEnd);
-      document.addEventListener('mousemove', this.onMouseMove);
-      document.addEventListener('mouseup', this.onMouseUp);
+      this.addMovementListeners();
     } else if (!this.state.dragging && state.dragging) {
-      document.removeEventListener('touchmove', this.onTouchMove);
-      document.removeEventListener('touchend', this.onTouchEnd);
-      document.removeEventListener('mousemove', this.onMouseMove);
-      document.removeEventListener('mouseup', this.onMouseUp);
+      this.removeMovementListeners();
     }
+  },
+
+  componentWillUnmount() {
+    this.removeMovementListeners();
   },
 
   render() {
